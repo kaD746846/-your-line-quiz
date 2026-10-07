@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>你心裡的那條線</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6F0E6; --paper-deep:#EFE3D1; --card:#FFFDF8; --line:#E4D8C4; --track:#E9DCC8;
+  --ink:#4A3628; --text:#5A4636; --muted:#9A7F66; --accent:#B08560; --accent-soft:#C9A27E;
+  --sel-bg:#E8D5BE; --btn:#6B4E36; --btn-text:#FFFDF8;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU","MingLiU",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#2A231E; --paper-deep:#352C25; --card:#332B25; --line:#4A3E34; --track:#4A3E34;
+    --ink:#F0E5D6; --text:#E2D4C2; --muted:#AD977F; --accent:#C9A27E; --accent-soft:#A88663;
+    --sel-bg:#5A4636; --btn:#E8D5BE; --btn-text:#2A231E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A231E; --paper-deep:#352C25; --card:#332B25; --line:#4A3E34; --track:#4A3E34;
+  --ink:#F0E5D6; --text:#E2D4C2; --muted:#AD977F; --accent:#C9A27E; --accent-soft:#A88663;
+  --sel-bg:#5A4636; --btn:#E8D5BE; --btn-text:#2A231E;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--serif);-webkit-font-smoothing:antialiased;min-height:100vh}
+#app{max-width:30rem;margin:0 auto;padding:2.5rem 1.4rem 3rem}
+.screen{animation:fadeIn .45s ease both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.leaving{opacity:0;transition:opacity .25s ease}
+@media (prefers-reduced-motion: reduce){.screen{animation:none}.leaving{transition:none}}
+
+.kicker{font-size:.75rem;color:var(--muted);letter-spacing:.15em;margin-bottom:1.8rem}
+.title{font-size:1.75rem;line-height:1.4;color:var(--ink);font-weight:500;margin:0 0 .8rem;white-space:nowrap}
+.h2{font-size:1.35rem;line-height:1.5;color:var(--ink);font-weight:500;margin:0 0 .8rem}
+.rule{width:6rem;height:1.5px;background:var(--accent);margin-bottom:1.6rem}
+p{margin:0}
+.body{font-size:1rem;line-height:1.95;color:var(--text)}
+.small{font-size:.82rem;line-height:1.8;color:var(--muted)}
+.meta{display:flex;gap:1rem;font-family:var(--sans);font-size:.78rem;color:var(--muted);margin:1.6rem 0 .6rem}
+
+.btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--btn);color:var(--btn-text);border:none;border-radius:999px;padding:.85rem 2.6rem;font-family:var(--serif);font-size:1.02rem;cursor:pointer}
+.btn-ghost{background:transparent;color:var(--btn);border:1px solid var(--btn);padding:.75rem 2rem;font-size:.95rem}
+.center{display:flex;justify-content:center}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+.progress{margin-bottom:1.8rem}
+.progress .num{font-size:.75rem;color:var(--muted);margin-bottom:.35rem}
+.progress .bar{height:3px;background:var(--track);border-radius:2px;overflow:hidden}
+.progress .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+
+.recap{font-size:.85rem;line-height:1.75;color:var(--muted);margin-bottom:1rem}
+.scene{font-size:1.02rem;line-height:1.95;color:var(--text);margin-bottom:.7rem}
+.quote{font-size:1.15rem;line-height:1.7;color:var(--ink);margin:.2rem 0 1.4rem .2rem}
+.msg{background:var(--card);border:.5px solid var(--line);border-radius:14px;padding:.8rem .9rem;margin:.4rem 0 1.4rem;font-family:var(--sans)}
+.msg-head{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.avatar{width:1.5rem;height:1.5rem;border-radius:50%;background:var(--sel-bg);flex:none}
+.msg-from{font-size:.82rem;color:var(--text);flex:1}
+.msg-time{font-size:.72rem;color:var(--muted)}
+.msg p{font-size:.95rem;line-height:1.7;color:var(--text)}
+.after{font-size:1.02rem;line-height:1.95;color:var(--text);margin-bottom:1.2rem}
+.gap{height:.6rem}
+
+.opts{display:flex;flex-direction:column;gap:.6rem;margin-top:.6rem}
+.opt{width:100%;text-align:left;background:var(--card);border:.5px solid var(--line);border-radius:12px;padding:.85rem 1rem;font-family:var(--serif);font-size:.98rem;line-height:1.65;color:var(--text);cursor:pointer;transition:background .15s ease,border-color .15s ease}
+.opt:hover{border-color:var(--accent-soft)}
+.opt.sel{background:var(--sel-bg);border-color:var(--accent);color:var(--ink)}
+.opts.locked .opt{pointer-events:none}
+
+.inward{background:var(--paper-deep);border-radius:16px;padding:1.3rem 1.1rem 1.1rem}
+.inward .ask{font-size:1.2rem;line-height:1.6;color:var(--ink);margin-bottom:1rem}
+
+.slider-val{text-align:center;margin:2rem 0 1rem}
+.slider-val b{font-weight:500;font-size:2.6rem;color:var(--btn)}
+.slider-val span{font-size:.9rem;color:var(--muted);margin-left:.3rem}
+input[type=range]{width:100%;accent-color:var(--btn)}
+.ends{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text);margin:.5rem 0 2rem}
+
+.cmp{margin-bottom:2rem}
+.cmp .lab{font-size:.85rem;color:var(--muted);margin-bottom:1rem}
+.row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text);margin-bottom:.4rem}
+.axis{position:relative;height:4px;background:var(--track);border-radius:2px;margin-bottom:1.1rem}
+.dot{position:absolute;top:-5px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%)}
+.dot.self{background:var(--accent-soft)}
+.dot.real{background:var(--btn)}
+.ends-sm{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin:-.5rem 0 1.1rem}
+.rcard{background:var(--card);border:.5px solid var(--line);border-radius:14px;padding:1.2rem 1.1rem;margin-bottom:.9rem}
+.rcard h3{font-size:1.08rem;font-weight:500;color:var(--ink);margin:0 0 .6rem}
+.rcard p{font-size:.95rem;line-height:1.95;color:var(--text)}
+.rcard p+p{margin-top:.7rem}
+.rcard.letter{background:var(--paper-deep);border:none}
+.tip{margin-bottom:1.1rem}
+.tip h4{font-size:1rem;font-weight:500;color:var(--ink);margin:0 0 .4rem}
+.tip p{font-size:.9rem;line-height:1.85}
+.tip .k{color:var(--muted);margin-right:.4rem}
+.closing{font-size:.88rem;line-height:1.85;color:var(--accent);margin-top:.4rem}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+
+<script>
+/* ---------- 標記說明 ----------
+g: 給  o=顧對方 m=折衷 s=顧自己
+y: 說  d=直接 f=委婉 h=放心裡 a=躲開
+h: 心  w=甘願 g=委屈 i=煩躁 l=放下 u=愧疚
+c: 察  1=察覺 -1=沒察覺
+gap / ok: 事情類型 t=時間被打斷 e=期待落空 f=勉強自己 u=付出沒被看見
+p: 模式 after=事後補償 sna=察覺但不行動 ag=爭取後自責 avoid=先躲再說
+f: 其他旗標
+------------------------------- */
+
+const QUESTIONS = [
+{ id:1, rel:'partner', n:1,
+  scene:{ pre:'週末晚上，你窩在沙發上打遊戲，正打到關鍵的地方。伴侶從房間走出來說：', quote:'「欸，可以來幫我一下嗎？」' },
+  opts:[
+    { t:'馬上放下去幫', rc:'你放下手把，起身去幫忙。', tg:{g:'o'},
+      ext:{ scene:{pre:'過去才發現，只是要你幫忙拿櫃子上面的東西。拿完回來，遊戲已經輸了。'},
+        opts:[
+          {t:'算了，沒關係，繼續玩', tg:{h:'l',ok:'t'}},
+          {t:'心裡有點悶，但不說', tg:{y:'h',h:'g',gap:'t'}},
+          {t:'半開玩笑說：「你欠我一次喔」', tg:{y:'f'}},
+          {t:'「下次這種不急的，可以等我一下嗎」', tg:{y:'d'}}
+        ]}},
+    { t:'「等我一下，弄完這段就來」', rc:'你說了聲「等我一下」，繼續打完這段。', tg:{g:'m'},
+      ext:{ scene:{pre:'二十分鐘過去，對方又來叫你，語氣有點不耐煩。'},
+        opts:[
+          {t:'有點愧疚，趕快過去', tg:{g:'o',h:'u'}},
+          {t:'覺得被催有點煩，但還是去', tg:{g:'o',h:'i'}},
+          {t:'解釋剛剛真的停不下來', tg:{y:'f'}},
+          {t:'「不是說好等一下嗎」', tg:{y:'d',h:'i'}}
+        ]}},
+    { t:'先問急不急，再決定', rc:'你先問了一句：「很急嗎？」', tg:{g:'m'},
+      ext:{ scene:{pre:'對方說「不急啦」，但語氣聽起來有點失落。'},
+        opts:[
+          {t:'照字面理解，先繼續玩', tg:{g:'s',c:-1}},
+          {t:'察覺到了，還是放下去幫', tg:{g:'o',c:1}},
+          {t:'問對方：「你是不是不開心？」', tg:{y:'d',c:1}},
+          {t:'繼續玩，但心裡一直在意', tg:{c:1,p:['sna']}}
+        ]}},
+    { t:'請對方先自己試試看', rc:'你請對方先自己試試看。', tg:{g:'s'},
+      ext:{ scene:{pre:'過了一會兒，你聽到對方小聲說「算了，我自己來」，接著是東西掉下來的聲音。'},
+        opts:[
+          {t:'有點擔心，馬上過去看', tg:{g:'o',f:['late']}},
+          {t:'有點愧疚，馬上過去看', tg:{g:'o',h:'u',p:['ag']}},
+          {t:'喊一聲「怎麼了？」，但沒起身', tg:{g:'m'}},
+          {t:'覺得對方在鬧脾氣，先不理', tg:{g:'s',c:-1}}
+        ]}}
+  ]},
+
+{ id:2, rel:'partner', n:2,
+  scene:{ pre:'你們約好這個週末，去一間期待了很久的店，你連那天要穿什麼都想好了。前一天晚上，手機跳出訊息：',
+    msg:{from:'伴侶',time:'22:15',lines:['明天可以先不要出門嗎…','這週真的好累']} },
+  opts:[
+    { t:'「沒關係，你好好休息」，真心覺得沒差', rc:'你回了「沒關係，你好好休息」。', tg:{g:'o',h:'l',ok:'e'}, f:['genuine2'],
+      ext:{ scene:{pre:'隔天下午，你看到對方發了限動，在家打遊戲，看起來很有精神。'},
+        opts:[
+          {t:'笑了一下，「真的沒差啦，對方開心就好」', tg:{h:'l',ok:'e'}},
+          {t:'有點不舒服，但不說', tg:{y:'h',h:'g',gap:'e',f:['misread']}},
+          {t:'傳訊息半開玩笑：「看起來很有精神嘛」', tg:{y:'f'}},
+          {t:'直接問：「你不是說很累？」', tg:{y:'d'}}
+        ]}},
+    { t:'「沒關係啊」，但心裡其實有點失落', rc:'你回了「沒關係啊」，但心裡有點失落。', tg:{g:'o',y:'h',h:'g',gap:'e'},
+      ext:{ scene:{pre:'隔天，對方傳來訊息：'}, msg:{from:'伴侶',time:'10:32',lines:['你是不是不開心？']},
+        opts:[
+          {t:'「沒有啊～我很好啦」', tg:{y:'h',gap:'e',f:['stillfine']}},
+          {t:'「有一點點啦」', tg:{y:'f'}},
+          {t:'坦白說其實很期待這次出去', tg:{y:'d'}},
+          {t:'轉移話題', tg:{y:'a',p:['avoid']}}
+        ]}},
+    { t:'提議改去近一點、輕鬆一點的地方', rc:'你提議改去近一點、輕鬆一點的地方。', tg:{g:'m',y:'f'},
+      ext:{ scene:{pre:'對方回：「可是我真的好累，可以就在家嗎？」'},
+        opts:[
+          {t:'「好吧～那就在家耍廢吧」，其實也覺得不錯', tg:{g:'o',h:'l',ok:'e'}},
+          {t:'在家陪對方，但一整天心裡有點悶', tg:{g:'o',y:'h',h:'g',gap:'e'}},
+          {t:'自己一個人去原本想去的地方', tg:{g:'s'}},
+          {t:'「好，那下週一定要去喔」', tg:{g:'m',y:'d'}}
+        ]}},
+    { t:'直接說：「可是我很期待欸」', rc:'你說：「可是我很期待欸。」', tg:{g:'s',y:'d'},
+      ext:{ scene:{pre:'對方沉默了一下，說「好啦，那還是去」。隔天出門，對方明顯沒什麼精神。'},
+        opts:[
+          {t:'「嗯…還好啦，至少有出來」', tg:{g:'s',h:'l'}},
+          {t:'有點愧疚，提議早點回家', tg:{g:'o',h:'u',p:['ag']}},
+          {t:'有點不爽，覺得對方在擺臉色', tg:{h:'i'}},
+          {t:'問對方：「你還好嗎？要不要回去？」', tg:{g:'o',c:1}}
+        ]}}
+  ]},
+
+{ id:3, rel:'closeFriend', n:3,
+  scene:{ pre:'這週的事情一件接著一件，今天終於結束的時候，你整個人像被掏空。你窩在床上，正準備放下手機睡覺，螢幕突然亮了起來：',
+    msg:{from:'最要好的朋友',time:'23:48',lines:['你睡了嗎','今天心情好差…可以聊聊嗎']} },
+  opts:[
+    { t:'撐著陪她聊', rc:'你撐著精神，陪她聊。', tg:{g:'o'},
+      ext:{ scene:{pre:'聊到凌晨一點多，她說：'}, quote:'「謝謝你，抱歉讓你這麼晚還沒睡。」',
+        opts:[
+          {t:'「哎唷～跟我客氣什麼啦」，真心這麼覺得', tg:{h:'w',ok:'f'}},
+          {t:'「沒事啦」，但其實已經累到不行', tg:{y:'h',h:'g',gap:'f'}},
+          {t:'半開玩笑：「下次早點找我啦哈哈」', tg:{y:'f'}},
+          {t:'坦白說自己今天其實也很累', tg:{y:'d'}}
+        ]}},
+    { t:'簡單安慰幾句，說要先睡了', rc:'你簡單安慰了幾句，說要先睡了。', tg:{g:'m',y:'f'},
+      ext:{ scene:{pre:'她回了一句。平常她都會加表情符號，這次沒有。'}, msg:{from:'最要好的朋友',time:'23:55',lines:['好喔，晚安']},
+        opts:[
+          {t:'「嗯…應該沒事吧」，就去睡了', tg:{h:'l',c:-1}},
+          {t:'注意到了，再補一句「明天一定找你聊」', tg:{g:'o',c:1}},
+          {t:'有點不安，躺著一直睡不著', tg:{c:1,p:['sna']}},
+          {t:'乾脆打電話給她', tg:{g:'o',c:1}}
+        ]}},
+    { t:'坦白說今天很累，約明天再聊', rc:'你坦白說今天很累，約她明天再聊。', tg:{g:'s',y:'d'},
+      ext:{ scene:{pre:'隔天，她傳來訊息：'}, msg:{from:'最要好的朋友',time:'12:10',lines:['沒事了啦，昨天只是一時情緒']},
+        opts:[
+          {t:'「真的嗎～那就好」，鬆了一口氣', tg:{h:'l',c:-1}},
+          {t:'覺得她可能只是不想說，再主動問問', tg:{g:'o',c:1}},
+          {t:'有點愧疚昨天沒陪她', tg:{h:'u'}},
+          {t:'約她出來吃東西', tg:{g:'o'}}
+        ]}},
+    { t:'先已讀，晚點再說', rc:'你先已讀，打算晚點再說。', tg:{g:'s',y:'a',p:['avoid']},
+      ext:{ scene:{pre:'隔天早上醒來，你看到她凌晨又傳了一則：'}, msg:{from:'最要好的朋友',time:'01:26',lines:['沒事了，你睡吧']},
+        opts:[
+          {t:'「呼…還好沒事」', tg:{h:'l',c:-1}},
+          {t:'很愧疚，馬上打給她', tg:{g:'o',h:'u',p:['after']}},
+          {t:'回「抱歉昨天睡著了」', tg:{y:'a'}},
+          {t:'傳訊息問她現在還好嗎', tg:{g:'o',p:['after']}}
+        ]}}
+  ]},
+
+{ id:4, rel:'friend', n:4,
+  scene:{ pre:'這個週末，你打算一個人待在家，什麼都不做。週四晚上，一個還算聊得來、但不算很熟的朋友傳來訊息：',
+    msg:{from:'朋友',time:'21:30',lines:['週末要不要一起去逛市集？']} },
+  opts:[
+    { t:'還是答應出去', rc:'你還是答應了。', tg:{g:'o'},
+      ext:{ scene:{pre:'出去到一半，你一直在滑手機，回話也心不在焉。對方停了一下，問：'}, quote:'「你今天是不是不太想出來？」',
+        opts:[
+          {t:'有點心虛，笑著說：「哈哈～沒有啦，只是有點累」', tg:{y:'h',gap:'f'}},
+          {t:'坦白說其實本來想待在家', tg:{y:'d'}},
+          {t:'覺得被看穿，有點尷尬', tg:{}},
+          {t:'打起精神，表現得更投入', tg:{g:'o'}}
+        ]}},
+    { t:'找個理由推掉', rc:'你找了個理由推掉。', tg:{g:'s',y:'f'},
+      ext:{ scene:{pre:'週末你在家，對方傳來一張大家玩得很開心的合照，看起來是真心想讓你下次也加入：'}, msg:{from:'朋友',time:'16:05',lines:['可惜你沒來～下次一起啦😆']},
+        opts:[
+          {t:'「哈哈～下次啦」，覺得在家剛剛好', tg:{h:'l'}},
+          {t:'有點小後悔', tg:{}},
+          {t:'有點心虛，怕理由被拆穿', tg:{h:'u'}},
+          {t:'感受到對方的心意，多回了幾句', tg:{g:'o',c:1}}
+        ]}},
+    { t:'直接說想自己待著', rc:'你直接說，這週末想自己待著。', tg:{g:'s',y:'d'},
+      ext:{ scene:{pre:'對方回了「喔喔好～」。之後好幾天，對方都沒再找你。'},
+        opts:[
+          {t:'「嗯～這樣也好」', tg:{h:'l'}},
+          {t:'開始擔心是不是讓對方不舒服了', tg:{h:'u',p:['ag']}},
+          {t:'主動找對方聊天', tg:{g:'o'}},
+          {t:'如果因為這樣就疏遠，那也沒辦法', tg:{g:'s'}}
+        ]}},
+    { t:'回「晚點再看看」，先拖著', rc:'你回了「晚點再看看」。', tg:{y:'a',p:['avoid']},
+      ext:{ scene:{pre:'週六早上，手機響了：'}, msg:{from:'朋友',time:'09:40',lines:['所以今天要出來嗎？']},
+        opts:[
+          {t:'「欸…好啦，那就出去吧」', tg:{g:'o'}},
+          {t:'這時才找理由推掉', tg:{g:'s',y:'f'}},
+          {t:'直接說今天想休息', tg:{g:'s',y:'d'}},
+          {t:'先不回，假裝還沒起床', tg:{y:'a',p:['avoid']}}
+        ]}}
+  ]},
+
+{ id:5, rel:'family', n:5,
+  scene:{ pre:'今天從早上忙到晚上，回到家洗完澡已經快十一點。你剛躺上床、眼睛快要閉上時，媽媽在樓下喊：', quote:'「你下來幫我一下！」' },
+  opts:[
+    { t:'雖然很累，還是撐起來馬上下去', rc:'你撐起身，馬上下樓。', tg:{g:'o'},
+      ext:{ scene:{pre:'原來是媽媽的手機不知道怎麼傳照片，這已經是你第三次教她了。'},
+        opts:[
+          {t:'「好啦～我再教一次」，耐心地教', tg:{g:'o',h:'w',ok:'t'}},
+          {t:'有點不耐煩：「我已經教你很多次了欸」', tg:{y:'d',h:'i'}},
+          {t:'有點累了，乾脆直接幫她弄好', tg:{g:'o'}},
+          {t:'有點無奈：「好啦～這次我寫下來給你，下次照著做喔」', tg:{g:'m'}}
+        ]}},
+    { t:'拖著疲累喊：「等一下！」，再躺一下才下去', rc:'你喊了聲「等一下！」，又躺了一會兒。', tg:{g:'m'},
+      ext:{ scene:{pre:'你又躺了大概十分鐘才起身下樓。媽媽說「不用了，我自己弄好了」，表情淡淡的。'},
+        opts:[
+          {t:'有點慶幸不用幫了：「喔～好喔」，轉身回房間', tg:{c:-1}},
+          {t:'有點愧疚，問還有什麼要幫忙的', tg:{g:'o',h:'u',c:1}},
+          {t:'覺得她好像不太高興，但不知道怎麼開口', tg:{c:1,p:['sna']}, fu:'q5why', rc:'你覺得媽媽好像不太高興，卻不知道怎麼開口。'},
+          {t:'有點委屈：「你叫我，我不是就下來了嗎」', tg:{y:'d',h:'g'}}
+        ]}},
+    { t:'有點不想動，喊回去問是什麼事', rc:'你喊回去：「什麼事？」', tg:{g:'m'},
+      ext:{ scene:{pre:'媽媽喊：'}, quote:'「你下來就知道！」',
+        opts:[
+          {t:'有點無奈地笑：「欸～好啦好啦」，下樓', tg:{g:'o',y:'f'}},
+          {t:'有點煩躁，拖了一下才下去', tg:{y:'h',h:'i'}},
+          {t:'不耐煩地再喊一次：「到底什麼事啦」', tg:{y:'d',h:'i'}},
+          {t:'下樓了，但臉很臭', tg:{g:'o',h:'i'}}
+        ]}},
+    { t:'累到不想回應，假裝沒聽到', rc:'你假裝沒聽到。', tg:{g:'s',y:'a',p:['avoid']},
+      ext:{ scene:{pre:'過了一會兒，你聽到媽媽在樓下自言自語：'}, quote:'「算了，應該睡了，讓孩子休息吧。」',
+        opts:[
+          {t:'鬆了一口氣：「呼…逃過一劫」', tg:{h:'l'}},
+          {t:'心裡有點愧疚，還是下樓了', tg:{g:'o',h:'u'}},
+          {t:'繼續躺著，但開始想「這樣做真的好嗎」，翻來覆去睡不著', tg:{h:'u',p:['sna']}},
+          {t:'當下太累了，隔天早上起來覺得過意不去，主動問媽媽昨天要做什麼', tg:{p:['after']}}
+        ]}}
+  ]},
+
+{ id:6, rel:'family', n:6,
+  scene:{ pre:'你在咖啡廳趕一份明天就要交的報告，耳機裡放著音樂，好不容易才進入狀況。手機開始一直震動：',
+    msg:{from:'家人',time:'15:20',lines:['在幹嘛','吃飯了沒？','什麼時候回家']} },
+  opts:[
+    { t:'每則都耐心回', rc:'你每一則都耐心地回。', tg:{g:'o'},
+      ext:{ scene:{pre:'一來一往回了十幾分鐘，手邊的事一直被打斷。最後家人傳來：'}, msg:{from:'家人',time:'15:36',lines:['好啦不吵你了，記得吃飯喔❤️']},
+        opts:[
+          {t:'「好啦～你也是喔」，心裡暖暖的', tg:{h:'w',ok:'t'}},
+          {t:'有點無奈，終於可以專心了', tg:{}},
+          {t:'嘆了口氣，要重新進入狀況有點吃力', tg:{y:'h',gap:'t'}},
+          {t:'語氣溫和地說：「下次我在忙的話，可能會晚點回喔」', tg:{y:'d'}}
+        ]}},
+    { t:'簡短回一句「在忙」', rc:'你簡短回了一句「在忙」。', tg:{g:'m',y:'f'},
+      ext:{ scene:{pre:'家人只回了一個字，之後就沒再傳了。'}, msg:{from:'家人',time:'15:22',lines:['喔']},
+        opts:[
+          {t:'「嗯…應該沒事吧」，繼續做事', tg:{c:-1}},
+          {t:'有點擔心自己太冷淡，補一句「晚點打給你」', tg:{g:'o',c:1}},
+          {t:'有點在意，但手邊的事比較重要', tg:{g:'s',c:1}},
+          {t:'忙完後有點過意不去，主動打電話回去', tg:{p:['after']}}
+        ]}},
+    { t:'先不回，忙完再一次回', rc:'你先不回，打算忙完再一次回。', tg:{g:'s'},
+      ext:{ scene:{pre:'忙完一看，有十幾則訊息和兩通未接來電，最後一則是：'}, msg:{from:'家人',time:'17:48',lines:['怎麼都不回？還好嗎？']},
+        opts:[
+          {t:'「哎呀～剛剛太專心了」，趕快回', tg:{h:'l'}},
+          {t:'有點愧疚，讓他們擔心了', tg:{h:'u'}},
+          {t:'有點無奈，覺得只是沒回訊息而已', tg:{g:'s'}},
+          {t:'有點緊張，直接打電話回去', tg:{g:'o'}}
+        ]}},
+    { t:'有點煩，回得比較衝', rc:'你回了一句：「我在忙啦，等一下再說。」', tg:{g:'s',y:'d',h:'i'},
+      ext:{ scene:{pre:'過了一下，家人回：'}, msg:{from:'家人',time:'15:23',lines:['好，抱歉打擾你了']},
+        opts:[
+          {t:'沒多想，「嗯…」，繼續做事', tg:{c:-1}},
+          {t:'心裡一沉，後悔剛剛語氣太差', tg:{h:'u',p:['ag']}},
+          {t:'有點不服氣，覺得他們本來就太常傳了', tg:{g:'s'}},
+          {t:'忙完後有點不好意思，傳訊息道歉', tg:{p:['after']}}
+        ]}}
+  ]},
+
+{ id:'att', rel:'work', n:7, single:true,
+  scene:{ pre:'接下來，假設你在公司上班。快下班的時候，同事在群組裡問：',
+    msg:{from:'部門群組',time:'17:42',lines:['今天有人要一起吃晚餐嗎？']} },
+  opts:[
+    { t:'「我要！」，下班後跟同事待在一起也很自在', tg:{att:'friend'} },
+    { t:'先看看是誰約、有誰會去', tg:{att:'depends'} },
+    { t:'「今天先不了～」，下班就想回到自己的生活', tg:{att:'separate'} },
+    { t:'看到了，但沒有回', tg:{att:'separate'} }
+  ]},
+
+{ id:7, rel:'work', n:7,
+  scene:{ pre:'明天早上要跟主管提案，簡報今晚 12 點前要整合好寄出。現在晚上 10 點，你的部分早就完成了，但負責「結論與建議」的同事還沒交，傳給他的訊息也一直沒有已讀。' },
+  opts:[
+    { t:'嘆了口氣，自己把他那部分趕出來', rc:'你嘆了口氣，自己把結論趕了出來。', tg:{g:'o',f:['helpsep']},
+      ext:{ scene:{pre:'11 點 50 分，簡報終於寄出。隔天早上，同事跑來說：'}, quote:'「抱歉抱歉！昨天家裡臨時有事，手機也沒電。」',
+        opts:[
+          {t:'「沒事啦～反正都弄好了」，真的沒放在心上', tg:{h:'l',ok:'u'}},
+          {t:'笑一笑沒多說，也沒跟任何人提是自己補的', tg:{y:'h',h:'w'}},
+          {t:'嘴上說沒事，但心裡其實不太舒服', tg:{y:'h',gap:'u'}, fu:'q7feel', rc:'你笑著說「沒事」，但心裡其實不太舒服。'},
+          {t:'語氣平靜但認真：「下次有狀況，至少先說一聲」', tg:{y:'d'}},
+          {t:'有點想被看見，找機會跟主管說那部分是自己補的', tg:{y:'d'}}
+        ]}},
+    { t:'有點急，一直打電話、傳訊息找他', rc:'你一直打電話、傳訊息找他。', tg:{g:'s',y:'d'},
+      ext:{ scene:{pre:'11 點，他終於回了：'}, msg:{from:'同事',time:'23:02',lines:['抱歉！我剛看到，現在馬上弄']},
+        opts:[
+          {t:'鬆了口氣：「呼～好，那你快一點喔」', tg:{h:'l'}},
+          {t:'有點火大，但先忍住', tg:{y:'h',h:'i'}},
+          {t:'語氣平穩：「你弄完先傳我，我幫你看一下」', tg:{g:'o'}},
+          {t:'不太放心，自己也同時寫一份備用', tg:{g:'o'}}
+        ]}},
+    { t:'冷靜地在工作群組說明狀況，大家一起分工補上', rc:'你在工作群組說明了狀況。', tg:{g:'m',y:'d'},
+      ext:{ scene:{pre:'另一個同事回了一句，之後群組就安靜下來，沒有人主動接手。'}, msg:{from:'專案群組',time:'22:14',lines:['他應該在忙吧，再等等？']},
+        opts:[
+          {t:'有點猶豫：「好吧～那再等等看」', tg:{y:'h'}},
+          {t:'有點無奈，自己默默接下來做', tg:{g:'o',y:'h',f:['helpsep']}},
+          {t:'有點急，直接分配：「那我們一人寫一段」', tg:{y:'d'}},
+          {t:'覺得卡住了，私訊主管說明狀況', tg:{g:'m'}}
+        ]}},
+    { t:'時間到就先寄，他的部分空著', rc:'時間到了，你先把簡報寄出，結論空著。', tg:{g:'s'}, fu:'q7reason',
+      ext:{ scene:{pre:'隔天早上，主管走過來問，而那位同事還沒進辦公室：'}, quote:'「結論怎麼是空的？」',
+        opts:[
+          {t:'有點尷尬地照實說：「呃…這部分是他負責的」', tg:{y:'d'}},
+          {t:'有點緊張，幫同事打圓場：「我們還在做最後調整」', tg:{g:'o'}},
+          {t:'心裡一沉，後悔昨天沒幫他補', tg:{h:'u',p:['ag']}},
+          {t:'冷靜地說：「我現在馬上補」', tg:{g:'o'}}
+        ]}}
+  ]},
+
+{ id:8, rel:'work', n:8,
+  scene:{ pre:'你手上有一份今天之內要寄給主管的資料還沒做完，正盯著螢幕趕進度。同事拿著筆電走到你旁邊：', quote:'「欸你可以幫我看一下這個嗎，我弄了好久都搞不定。」' },
+  opts:[
+    { t:'放下手邊的工作，好好幫他看', rc:'你放下手邊的工作，幫他看。', tg:{g:'o',f:['helpsep']},
+      ext:{ scene:{pre:'弄了四十分鐘終於解決，同事說要請你喝飲料。你看了一下時間，離下班只剩一小時，自己的東西還沒做完。'},
+        opts:[
+          {t:'「哈哈～不用啦」，趕快回去衝刺', tg:{h:'w'}},
+          {t:'有點焦慮，後悔剛剛幫太久', tg:{}},
+          {t:'有點無奈，決定留下來加班把它做完', tg:{g:'o'}},
+          {t:'主動跟主管說明狀況，問能不能明天早上交', tg:{y:'d'}}
+        ]}},
+    { t:'有點趕，快速給個方向，再回去做自己的', rc:'你快速給了他一個方向，就回去做自己的。', tg:{g:'m'},
+      ext:{ scene:{pre:'半小時後，他又走過來：'}, quote:'「你剛剛說的那個，我還是弄不出來…」',
+        opts:[
+          {t:'「沒問題～我們一起再看一次」，耐心地講', tg:{g:'o',h:'w'}},
+          {t:'有點不耐煩，但還是幫他', tg:{g:'o',y:'h',h:'i'}},
+          {t:'有點為難地說：「我真的要先做完這個，晚點再幫你看好嗎」', tg:{g:'s',y:'d'}},
+          {t:'「你要不要問問看其他人？」', tg:{g:'s'}, fu:'q8reason', rc:'你建議他去問問看其他人。'}
+        ]}},
+    { t:'把之前做過的範例檔給他，讓他自己參考', rc:'你把之前做過的範例檔傳給他。', tg:{g:'m'},
+      ext:{ scene:{pre:'他說「喔…好，謝謝」，拿著筆電慢慢走回座位，看起來還是很困擾。'},
+        opts:[
+          {t:'「嗯～應該看了就會懂吧」，繼續做自己的', tg:{c:-1}},
+          {t:'有點不放心，補一句：「看不懂再來找我」', tg:{g:'o',c:1}},
+          {t:'有點過意不去，但手邊的事真的很急', tg:{c:1,p:['sna']}},
+          {t:'忙完後還記著這件事，主動過去看他弄得怎麼樣', tg:{p:['after']}}
+        ]}},
+    { t:'有點抱歉地說：「我這個今天要交，明天再幫你看」', rc:'你說：「我這個今天要交，明天再幫你看。」', tg:{g:'s',y:'d'}, fu:'q8reason',
+      ext:{ scene:{pre:'過了一會兒，你看到另一個同事走過去幫他了。'},
+        opts:[
+          {t:'鬆了口氣：「呼～太好了」', tg:{h:'l'}},
+          {t:'有點過意不去', tg:{h:'u'}},
+          {t:'有點不安，擔心他會覺得你很難相處', tg:{h:'u'}},
+          {t:'心裡很坦然，覺得本來就該先顧好自己的事', tg:{g:'s',h:'l'}}
+        ]}}
+  ]}
+];
+
+const FOLLOWUPS = {
+  q5why:{ ask:'你為什麼覺得她不高興？', opts:[
+    {t:'她的表情和語氣跟平常不一樣', tg:{c:1}},
+    {t:'她平常不高興的時候就是這樣', tg:{c:1}},
+    {t:'說不上來，就是有這種感覺', tg:{c:1}},
+    {t:'因為我剛剛拖了一下，她應該會不高興', tg:{h:'u'}}
+  ]},
+  q7reason:{ ask:'你會這樣做，最主要的原因是？', opts:[
+    {t:'就事論事，每個人本來就該負責自己的部分', tg:{}},
+    {t:'有點火大，不想替他收拾', tg:{h:'i'}},
+    {t:'自己的部分已經做完了，沒必要再多扛', tg:{}},
+    {t:'想讓問題被看見，而不是被我掩蓋', tg:{}}
+  ]},
+  q7feel:{ ask:'那種不舒服，比較像是？', opts:[
+    {t:'委屈，又是我在收拾', tg:{h:'g'}},
+    {t:'不爽，憑什麼是我', tg:{h:'i'}},
+    {t:'失望，原本以為他很可靠', tg:{h:'g'}},
+    {t:'以後跟他合作，會多留一手', tg:{}},
+    {t:'算了，累了不想計較', tg:{h:'l'}}
+  ]},
+  q8reason:{ ask:'你會這樣做，最主要的原因是？', opts:[
+    {t:'手上的事真的太急了', tg:{}},
+    {t:'跟他沒那麼熟，不想花太多時間', tg:{f:['notclose']}},
+    {t:'他常常這樣找人幫忙', tg:{}},
+    {t:'不想變成大家固定找的那個人', tg:{}}
+  ]}
+};
+
+/* ---------- 狀態 ---------- */
+let S;
+function reset(){ S = { self:5, ans:[], qi:0 }; }
+reset();
+
+const app = document.getElementById('app');
+const TOTAL_STEPS = QUESTIONS.length;
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function render(html, after){
+  const old = app.firstElementChild;
+  const swap = ()=>{
+    app.innerHTML = '<div class="screen">'+html+'</div>';
+    window.scrollTo(0,0);
+    if(after) after();
+    const h = app.querySelector('h1,h2,.scene,.ask');
+    if(h){ h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  };
+  if(old && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+    old.classList.add('leaving'); setTimeout(swap, 250);
+  } else swap();
+}
+
+function progressHTML(){
+  const q = QUESTIONS[S.qi];
+  const pct = Math.round((S.qi+0.5)/TOTAL_STEPS*100);
+  return `<div class="progress"><div class="num">${q.n} / 8</div><div class="bar"><div class="fill" style="width:${pct}%"></div></div></div>`;
+}
+
+function sceneHTML(sc, quote, msg){
+  let h = '';
+  if(sc && sc.pre) h += `<p class="scene">${esc(sc.pre)}</p>`;
+  const qt = quote || (sc && sc.quote);
+  const m = msg || (sc && sc.msg);
+  if(qt) h += `<p class="quote">${esc(qt)}</p>`;
+  if(m){
+    h += `<div class="msg"><div class="msg-head"><div class="avatar" aria-hidden="true"></div><span class="msg-from">${esc(m.from)}</span><span class="msg-time">${esc(m.time)}</span></div>${m.lines.map(l=>`<p>${esc(l)}</p>`).join('')}</div>`;
+  }
+  if(!qt && !m) h += '<div class="gap"></div>';
+  return h;
+}
+
+function optsHTML(opts){
+  return `<div class="opts" role="group">${opts.map((o,i)=>`<button class="opt" data-i="${i}">${esc(o.t)}</button>`).join('')}</div>`;
+}
+
+function bindOpts(opts, onPick){
+  const wrap = app.querySelector('.opts');
+  wrap.querySelectorAll('.opt').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      wrap.classList.add('locked');
+      b.classList.add('sel');
+      const o = opts[+b.dataset.i];
+      setTimeout(()=>onPick(o), 380);
+    });
+  });
+}
+
+function record(o, rel){ S.ans.push({ rel, tg:o.tg||{} }); }
+
+/* ---------- 畫面 ---------- */
+function showStart(){
+  render(`
+    <div class="kicker">一份關於你的小測驗</div>
+    <h1 class="title">你心裡的那條線</h1>
+    <div class="rule"></div>
+    <p class="body" style="margin-bottom:.8rem">生活裡，總有些時候，別人的需要和你自己的狀態撞在一起。</p>
+    <p class="body">那些時候，你會怎麼選？</p>
+    <div class="meta"><span>8 個情境</span><span>約 5–8 分鐘</span></div>
+    <p class="small" style="margin-bottom:2rem">沒有對錯，選最接近你真實反應的那一個就好。</p>
+    <div class="center"><button class="btn" id="go">開始</button></div>
+  `, ()=>{ document.getElementById('go').onclick = showSelf; });
+}
+
+function showSelf(){
+  render(`
+    <div class="kicker">在開始之前</div>
+    <h2 class="h2">你覺得自己比較是？</h2>
+    <div class="rule"></div>
+    <p class="body">當別人需要你，而你自己也有事、也很累的時候。</p>
+    <div class="slider-val"><b id="sv">${S.self}</b><span>/ 10</span></div>
+    <input type="range" min="1" max="10" step="1" value="${S.self}" id="sr" aria-label="自評分數，1 是先顧好自己，10 是先顧別人">
+    <div class="ends"><span>先顧好自己</span><span>先顧別人</span></div>
+    <p class="small" style="text-align:center;margin-bottom:2rem">憑直覺就好</p>
+    <div class="center"><button class="btn" id="go">下一步</button></div>
+  `, ()=>{
+    const r = document.getElementById('sr'), v = document.getElementById('sv');
+    r.oninput = ()=>{ S.self = +r.value; v.textContent = r.value; };
+    document.getElementById('go').onclick = ()=>{ S.qi = 0; showMain(); };
+  });
+}
+
+function showMain(){
+  const q = QUESTIONS[S.qi];
+  render(progressHTML() + sceneHTML(q.scene) + optsHTML(q.opts), ()=>{
+    bindOpts(q.opts, o=>{
+      record(o, q.rel);
+      if(q.single) return advance();
+      if(o.fu) return showFollow(o.fu, o.rc, ()=>showExt(o));
+      showExt(o);
+    });
+  });
+}
+
+function showExt(mainOpt){
+  const q = QUESTIONS[S.qi];
+  const e = mainOpt.ext;
+  render(progressHTML() + `<p class="recap">${esc(mainOpt.rc)}</p>` + sceneHTML(e.scene, e.quote, e.msg) + optsHTML(e.opts), ()=>{
+    bindOpts(e.opts, o=>{
+      record(o, q.rel);
+      if(o.fu) return showFollow(o.fu, o.rc, advance);
+      advance();
+    });
+  });
+}
+
+function showFollow(key, recap, then){
+  const q = QUESTIONS[S.qi];
+  const f = FOLLOWUPS[key];
+  render(progressHTML() + `<p class="recap">${esc(recap)}</p><div class="inward"><p class="ask">${esc(f.ask)}</p>${optsHTML(f.opts)}</div>`, ()=>{
+    bindOpts(f.opts, o=>{ record(o, q.rel); then(); });
+  });
+}
+
+function advance(){
+  S.qi++;
+  if(S.qi >= QUESTIONS.length) showResult();
+  else showMain();
+}
+
+/* ---------- 計分 ---------- */
+const REL_NAME = { partner:'伴侶', closeFriend:'最要好的朋友', friend:'不太熟的朋友', family:'家人', work:'同事' };
+const REL_WITH = { partner:'你和伴侶之間', closeFriend:'你和最要好的朋友之間', friend:'你和不太熟的朋友之間', family:'你和家人之間', work:'你和同事之間' };
+const CLOSE = new Set(['partner','closeFriend','family']);
+const GIVE_HI = { partner:'對伴侶，你很容易讓步', closeFriend:'對最要好的朋友，你願意撐著陪', friend:'對不太熟的朋友，你也很難說不', family:'對家人，你幾乎有求必應', work:'在職場上，你常常默默多扛' };
+const GIVE_LO = { partner:'對伴侶，你反而會守住自己的時間', closeFriend:'即使是最要好的朋友，你也會誠實說出自己的極限', friend:'對不太熟的朋友，你能坦然說不', family:'對家人，你會替自己留一點空間', work:'在職場上，你守得住自己的線' };
+const CAT_NAME = { t:'自己的時間被打斷', e:'期待落空', f:'勉強自己配合別人', u:'付出沒被看見' };
+const CAT_WHY = {
+  t:'你的時間對你來說很珍貴，被打斷時的煩，常常比你表現出來的多。',
+  e:'你對說好的事很認真，落空時的失落，不會因為一句「沒關係」就消失。',
+  f:'你很努力配合別人，但那些撐著的時刻，其實都在消耗你。',
+  u:'你不一定需要被感謝，但你希望自己的付出至少被看見。'
+};
+
+const T_GIVE = {
+  o:'你很習慣把別人的需要放在前面。有人開口時，你的第一個念頭通常是「我可以幫什麼」，而不是「我現在方便嗎」。這讓身邊的人很依賴你，但你自己的需要，常常被排到最後。',
+  m:'你會在別人的需要和自己的狀態之間找平衡。願意幫忙，但會先看看自己還有沒有餘力。你不會為了別人完全犧牲自己，也不會對別人的需要視而不見。',
+  s:'你清楚自己的狀態和優先順序，不會因為別人開口就輕易放下手邊的事。這不代表你不在乎別人，而是你知道，要先顧好自己，才有力氣照顧別人。'
+};
+const T_SAY = {
+  d:'你習慣把話說清楚。有不滿、有期待，你會直接讓對方知道，不太繞圈子。和你相處的人，通常不用猜你在想什麼。',
+  f:'你有感覺時會說，但會用比較輕的方式，像是開個玩笑、說「一點點啦」。你在意自己的感受，也在意不讓氣氛變僵。',
+  h:'很多時候，你選擇把感受收起來。不是沒感覺，而是覺得說出來會造成負擔，或是不知道怎麼開口。',
+  a:'遇到為難或情緒化的時刻，你的第一反應是先避開。已讀、拖延、轉移話題，是你替自己爭取空間的方式。'
+};
+const T_HEART = {
+  w:'你的付出大多是心甘情願的。幫了忙、讓了步，你不太會在心裡記帳，對你來說，能幫上忙本身就是一件好事。',
+  g:'你常常做了很多，心裡卻有一點委屈。你不一定會說出來，但那種「為什麼又是我」的感覺，其實一直都在。',
+  i:'當自己的狀態被打斷，你的情緒來得很快。累的時候、忙的時候，耐心會變薄，煩躁很容易寫在語氣或臉上。',
+  l:'事情過了，你就能放下。不太翻舊帳，也不讓小事在心裡打轉，這讓你在關係裡顯得很輕鬆。',
+  u:'你很容易覺得是自己的錯。拒絕之後、拖延之後，甚至只是沒察覺對方的情緒，你都會在心裡責怪自己。'
+};
+const T_SENSE = {
+  hi:'你很會讀空氣。一個語氣、少了一個表情符號、一句「不急啦」，你都能感覺到背後的意思。',
+  mid:'明顯的情緒你看得出來，但比較細微的訊號，有時會錯過，或是要等事情發展下去才意識到。',
+  lo:'你傾向相信對方說出口的話，不太去猜弦外之音。這讓你相處起來很單純，但有時會錯過對方沒說出口的需要。'
+};
+
+const PATTERNS = {
+  after:'你常常在當下先顧好自己，但事後一定會回頭補上。對你來說，拒絕從來不是結束，而是一件放在心上的事。',
+  sna:'你其實看得很清楚，別人的失落、氣氛的變化，你都感覺得到。只是很多時候，這些感受停在心裡反覆打轉，沒有變成行動。你比別人以為的更在意，只是他們不知道。',
+  ag:'你能替自己爭取，也能說不，但說完之後，常常會回頭懷疑自己是不是太過分了。你守住了界線，卻沒有放過自己。',
+  avoid:'面對為難的時候，你的第一反應是先避開。不是因為你不在乎，而是正面面對讓你覺得太累、太有壓力。只是躲開的事，通常不會自己消失。',
+  late:'你不太會注意到小小的訊號，常常要等事情變得明顯，才意識到對方其實需要你。不是你不在乎，而是你習慣相信「沒說就是沒事」。',
+  mis1:'你說同事只是一起工作的人，卻常常替他們多扛。你幫忙不是因為交情，而是責任感讓你放不下。',
+  mis2:'你對同事是敞開的，但真正要付出的時候，你其實很清楚誰才是自己人。'
+};
+const NO_PATTERN = {
+  s:'你很照著自己的想法走，決定了就不太回頭，也不太被別人的反應牽著跑。你的選擇很一致，想的和做的之間，沒有太多藏起來的部分。',
+  m:'你會考慮別人，但最後還是照著自己的判斷做決定。你的選擇很一致，想的和做的之間，沒有太多藏起來的部分。',
+  o:'你的付出大多是真心的，願意為別人做的事，你就不太會在心裡留下疙瘩。你的選擇很一致，想的和做的之間，沒有太多藏起來的部分。'
+};
+
+const TIPS = {
+  self:{ t:'多在意自己一點', a:'你的累和失落，跟別人的需要一樣重要。', b:'答應別人之前，你心裡的第一個反應是什麼。', c:'說「沒關係」之前，先停一秒問自己：是真的沒關係嗎？' },
+  signal:{ t:'留意沒說出口的訊號', a:'有些需要，不會被直接說出口。', b:'對方說「不急」「沒事」時的語氣和表情。', c:'覺得有點不對勁時，問一句「你還好嗎？」' },
+  speak:{ t:'說出小小的不舒服', a:'委屈累積久了，會在某天一次爆發。', b:'哪些事讓你嘴上說沒關係，心裡卻記很久。', c:'不用等到很嚴重，一句「我有點失落」就夠了。' },
+  noguilt:{ t:'拒絕不等於做錯', a:'守住界線，不代表傷害了別人。', b:'你拒絕之後，對方真的有像你想的那麼受傷嗎？', c:'拒絕之後，提醒自己「我也有權利照顧自己」。' },
+  now:{ t:'當下多說一句', a:'你的在意，對方當下是看不到的。', b:'事後回頭補的那些事，有多少其實當下一句話就能解決。', c:'拒絕的時候，加一句「我晚點找你」。' },
+  small:{ t:'一個小動作就夠', a:'察覺到卻沒說，對方不會知道你在意。', b:'你心裡反覆擔心的事，最後有多少真的發生了。', c:'不需要想好完整的話，一句「你還好嗎」就能打破沉默。' },
+  direct:{ t:'直接比躲輕鬆', a:'躲開的事，通常會變得更難處理。', b:'躲開之後，你心裡真的有比較輕鬆嗎？', c:'用一句簡單的話回應，例如「今天不太方便，下次好嗎？」' },
+  tired:{ t:'累的時候先說出來', a:'疲累會讓你的語氣比自己以為的更尖。', b:'你最容易不耐煩的時候，是累、忙，還是被催？', c:'先說一句「我現在有點累，等一下回你」。' },
+  close:{ t:'偶爾讓別人靠近一點', a:'照顧好自己很好，偶爾的付出也能讓關係更深。', b:'在你需要的時候，誰總是在你身邊。', c:'在有餘力的時候，主動替重要的人多做一點。' }
+};
+
+function analyze(){
+  const A = S.ans;
+  const gv = {o:1,m:.5,s:0}, sv = {d:1,f:.6,h:0,a:0};
+  let gSum=0,gN=0; const relG={}, relS={}, relGap={};
+  const sayC={d:0,f:0,h:0,a:0}, heartC={w:0,g:0,i:0,l:0,u:0};
+  let senseHi=0, senseLo=0, gapN=0;
+  const catGap={t:0,e:0,f:0,u:0}, catOk={t:0,e:0,f:0,u:0};
+  const pat={after:0,sna:0,ag:0,avoid:0};
+  const flags=new Set(); let att=null;
+
+  A.forEach(({rel,tg})=>{
+    if(tg.g){ gSum+=gv[tg.g]; gN++; (relG[rel]=relG[rel]||[]).push(gv[tg.g]); }
+    if(tg.y){ sayC[tg.y]++; (relS[rel]=relS[rel]||[]).push(sv[tg.y]); }
+    if(tg.h) heartC[tg.h]++;
+    if(tg.c===1) senseHi++; if(tg.c===-1) senseLo++;
+    if(tg.gap){ gapN++; catGap[tg.gap]++; relGap[rel]=(relGap[rel]||0)+1; }
+    if(tg.ok) catOk[tg.ok]++;
+    (tg.p||[]).forEach(p=>pat[p]++);
+    (tg.f||[]).forEach(f=>flags.add(f));
+    if(tg.att) att = tg.att;
+  });
+
+  const ratio = gN? gSum/gN : .5;
+  const giveLv = ratio>=.6?'o':ratio<=.4?'s':'m';
+  const pick = (obj, order)=> order.reduce((b,k)=> obj[k]>obj[b]?k:b, order[0]);
+  const sayLv = pick(sayC,['h','f','d','a']);
+  const heartLv = pick(heartC,['g','u','i','w','l']);
+  const sTot = senseHi+senseLo;
+  const senseLv = !sTot?'mid': (senseHi/sTot>=.6?'hi': senseHi/sTot<=.35?'lo':'mid');
+  const avg = a=>a.reduce((x,y)=>x+y,0)/a.length;
+
+  return { ratio, giveLv, sayLv, heartLv, senseLv, relG, relS, relGap, gapN, catGap, catOk, pat, flags, att, avg, sayC };
+}
+
+function buildResult(){
+  const R = analyze();
+  const out = {};
+
+  /* 0. 對照 */
+  const real = Math.max(1, Math.min(10, Math.round(R.ratio*10*2)/2));
+  const self = S.self;
+  const diff = real - self;
+  const cheng = Math.round(R.ratio*10);
+  let cmp;
+  if(Math.abs(diff) < 2) cmp = `你給自己 ${self} 分，而你的選擇也落在差不多的位置。你對自己的了解很準確。`;
+  else if(diff > 0) cmp = `你給自己 ${self} 分，但你的選擇其實是 ${real} 分。在這次的選擇裡，你有 ${cheng} 成的時候都先顧了別人。你比自己以為的更常先顧別人，也許你的付出已經自然到，連自己都沒發現。`;
+  else cmp = `你給自己 ${self} 分，但你的選擇其實是 ${real} 分。在這次的選擇裡，你有 ${10-cheng} 成的時候先顧了自己。你比自己以為的更懂得照顧自己，心裡覺得「應該」怎麼做，和實際的選擇不太一樣。`;
+  if(Math.abs(diff) >= 4) cmp += '這個落差不小，也許值得想一想：你心中的自己，是從哪裡來的？';
+  out.cmp = { self, real, text:cmp };
+
+  /* 1. 整體 */
+  const p1 = [T_GIVE[R.giveLv], T_SAY[R.sayLv], T_HEART[R.heartLv], T_SENSE[R.senseLv]];
+  let bridge = '';
+  if(R.senseLv==='hi' && (R.sayLv==='h'||R.sayLv==='a')) bridge = '你讀得懂別人沒說的情緒，卻很少讓別人讀懂你的。';
+  else if(R.giveLv==='o' && R.sayLv==='h') bridge = '你給出去的很多，說出口的卻很少。';
+  else if(R.giveLv==='s' && R.sayLv==='d') bridge = '你知道自己要什麼，也說得出口，這讓你在關係裡很少迷路。';
+  out.whole = { paras:[p1[0], p1[1]+p1[2], p1[3]+(bridge?bridge:'')] };
+
+  /* 2. 不同關係 */
+  const rels = Object.keys(R.relG);
+  const relAvg = {}; rels.forEach(r=> relAvg[r]=R.avg(R.relG[r]));
+  const sorted = rels.slice().sort((a,b)=>relAvg[b]-relAvg[a]);
+  const hi = sorted[0], lo = sorted[sorted.length-1];
+  let giveTxt;
+  const allAvg = R.ratio;
+  if(relAvg[hi]-relAvg[lo] < .25){
+    giveTxt = allAvg>=.6 ? '不管對誰，你都很習慣先照顧對方，這是你的溫柔，也可能是你累的原因。' : '你對每個人的界線都很一致，不太因為關係遠近而改變。';
+  } else {
+    const closeV = rels.filter(r=>CLOSE.has(r)).map(r=>relAvg[r]);
+    const farV = rels.filter(r=>!CLOSE.has(r)).map(r=>relAvg[r]);
+    const cd = (closeV.length&&farV.length)? R.avg(closeV)-R.avg(farV) : 0;
+    let tail;
+    if(cd >= .2) tail = '你的付出跟著親疏走，越在乎的人，你越願意放下自己。';
+    else if(cd <= -.2) tail = '你在親近的人面前反而比較能做自己，因為你相信他們接得住你的拒絕；面對不熟的人，你卻很難開口說不。';
+    else tail = '你的界線不是不存在，而是會依照每段關係、每個人移動。';
+    giveTxt = `${GIVE_HI[hi]}；但${GIVE_LO[lo]}。${tail}`;
+  }
+  let sayTxt = '';
+  const sRels = Object.keys(R.relS);
+  if(sRels.length >= 2){
+    const sAvg = {}; sRels.forEach(r=> sAvg[r]=R.avg(R.relS[r]));
+    const ss = sRels.slice().sort((a,b)=>sAvg[b]-sAvg[a]);
+    const sh = ss[0], sl = ss[ss.length-1];
+    if(sAvg[sh]-sAvg[sl] < .3) sayTxt = '你表達感受的方式，不太因為對象而改變。';
+    else {
+      sayTxt = `你對${REL_NAME[sh]}能直接說出感受，但對${REL_NAME[sl]}，你多半放在心裡。`;
+      if(CLOSE.has(sh) && !CLOSE.has(sl)) sayTxt += '在越安心的關係裡，你越敢說真話。';
+      else if(!CLOSE.has(sh) && CLOSE.has(sl)) sayTxt += '越在乎的人，你越怕說出口會傷到關係。';
+    }
+  }
+  out.rel = { paras:[giveTxt, sayTxt].filter(Boolean) };
+
+  /* 3. 說與不說 */
+  let gapTxt = R.gapN<=1 ? '你說的和心裡想的大多一致。說沒關係時，通常就是真的沒關係；不開心時，也會讓對方知道。這讓和你相處的人很安心，不需要猜。'
+    : R.gapN<=3 ? '大部分時候你都說真話，但有些時刻，你會把真正的感受收起來。通常是怕氣氛變僵，或是覺得「這點小事不值得說」。'
+    : '你很習慣說「沒關係」，但其實每一次都記得。那些沒說出口的失落和委屈，不會因為沒說就消失，只是被你一個人收著。';
+  const gapCats = Object.keys(R.catGap).filter(k=>R.catGap[k]>0).sort((a,b)=>R.catGap[b]-R.catGap[a]);
+  const okCats = Object.keys(R.catOk).filter(k=>R.catOk[k]>0 && R.catGap[k]===0).sort((a,b)=>R.catOk[b]-R.catOk[a]);
+  let catTxt = '';
+  if(gapCats.length && okCats.length) catTxt = `對於${CAT_NAME[okCats[0]]}，你是真的不太在意；但遇到${CAT_NAME[gapCats[0]]}，你嘴上說沒關係，心裡其實很在意。${CAT_WHY[gapCats[0]]}`;
+  else if(gapCats.length) catTxt = `尤其遇到${CAT_NAME[gapCats[0]]}，你嘴上說沒關係，心裡其實很在意。${CAT_WHY[gapCats[0]]}`;
+  let extra = '';
+  const gr = Object.keys(R.relGap).sort((a,b)=>R.relGap[b]-R.relGap[a])[0];
+  if(gr && R.relGap[gr] >= 2) extra += `這種落差，在${REL_WITH[gr]}特別明顯。`;
+  if(R.flags.has('misread')) extra += '有些時候，你甚至以為自己不在意，直到後來才發現，你比自己想的更在意。';
+  if(R.flags.has('stillfine')) extra += '就算有人主動問起，你還是習慣說「我很好」。';
+  out.gap = { paras:[gapTxt, catTxt, extra].filter(Boolean) };
+
+  /* 4. 沒發現的事 */
+  const score = {};
+  ['after','sna','ag','avoid'].forEach(k=>{ if(R.pat[k]>=2) score[k]=R.pat[k]; });
+  if(R.flags.has('late') && R.senseLv==='lo') score.late = 2;
+  if(R.att==='separate' && R.flags.has('helpsep')) score.mis1 = 2;
+  if(R.att==='friend' && R.flags.has('notclose')) score.mis2 = 2;
+  const pats = Object.keys(score).sort((a,b)=>score[b]-score[a]).slice(0,2);
+  out.hidden = { paras: pats.length ? pats.map(k=>PATTERNS[k]) : [NO_PATTERN[R.giveLv]] };
+
+  /* 5. 提醒 */
+  const tipKeys = [];
+  const add = k=>{ if(!tipKeys.includes(k)) tipKeys.push(k); };
+  if(score.after) add('now');
+  if(score.sna) add('small');
+  if(score.avoid || R.sayLv==='a') add('direct');
+  if(score.ag || R.heartLv==='u') add('noguilt');
+  if(R.heartLv==='g' || gapCats.length) add('speak');
+  if(R.heartLv==='i') add('tired');
+  if(R.giveLv==='o' || R.gapN>=4) add('self');
+  if(R.senseLv==='lo') add('signal');
+  if(R.giveLv==='s') add('close');
+  if(!tipKeys.length) add(R.giveLv==='m' ? 'signal' : 'self');
+  out.tips = tipKeys.slice(0,3).map(k=>TIPS[k]);
+
+  return out;
+}
+
+function showResult(){
+  const r = buildResult();
+  const pos = v => ((v-1)/9*100).toFixed(1)+'%';
+  const card = (title, paras, cls='') => `<section class="rcard ${cls}"><h3>${title}</h3>${paras.map(p=>`<p>${esc(p)}</p>`).join('')}</section>`;
+  render(`
+    <div class="kicker">你心裡的那條線</div>
+    <h1 class="h2">你的結果</h1>
+    <div class="rule"></div>
+    <section class="cmp">
+      <p class="lab">你以為的你，和選擇裡的你</p>
+      <div class="row"><span>你以為的你</span><span>${r.cmp.self}</span></div>
+      <div class="axis"><div class="dot self" style="left:${pos(r.cmp.self)}"></div></div>
+      <div class="row"><span>選擇裡的你</span><span>${r.cmp.real}</span></div>
+      <div class="axis"><div class="dot real" style="left:${pos(r.cmp.real)}"></div></div>
+      <div class="ends-sm"><span>先顧好自己</span><span>先顧別人</span></div>
+      <p class="body">${esc(r.cmp.text)}</p>
+    </section>
+    ${card('整體的你', r.whole.paras)}
+    ${card('在不同的人面前', r.rel.paras)}
+    ${card('說與不說之間', r.gap.paras)}
+    ${card('你可能沒發現的事', r.hidden.paras)}
+    <section class="rcard letter">
+      <h3>給你的提醒</h3>
+      ${r.tips.map(t=>`<div class="tip"><h4>${esc(t.t)}</h4><p><span class="k">多注意</span>${esc(t.a)}</p><p><span class="k">觀察</span>${esc(t.b)}</p><p><span class="k">試試看</span>${esc(t.c)}</p></div>`).join('')}
+      <p class="closing">這些不是你的缺點，只是讓你能更舒服地和別人相處的方向。</p>
+    </section>
+    <div class="center" style="margin-top:1.6rem"><button class="btn btn-ghost" id="again">再測一次</button></div>
+  `, ()=>{ document.getElementById('again').onclick = ()=>{ reset(); showStart(); }; });
+}
+
+showStart();
+</script>
+</body>
+</html>
